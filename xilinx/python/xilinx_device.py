@@ -451,7 +451,13 @@ def import_device(name, prjxray_root, metadata_root):
 		return ij["intents"][str(ij["tiles"][tiletype][wirename])]
 
 	d = Device(name)
-	fabricname = name.split('t')[0] + "t"
+
+	# this doesnt work for the zynq part numbers apparently, the "t" is missing :)
+	# fabricname = name.split('t')[0] + "t"
+	fabricname = name[:7]
+
+	print(f'*** name: {name}')
+	print(f'*** fabricname: {fabricname}')
 	# Load intent JSON
 	with open(metadata_root + "/wire_intents.json", "r") as ijf:
 		ij = json.load(ijf)
