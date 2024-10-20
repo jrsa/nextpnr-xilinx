@@ -504,6 +504,8 @@ struct FasmBackend
         push(tname);
         push(get_half_name(half, boost::contains(tname, "CLBLM")));
 
+        log_info("writing ffs in tile %s half %u\n", tname.c_str(), half);
+
         for (int i = 0; i < 4; i++) {
             CellInfo *ff1 = lts->cells[(half << 6) | (i << 4) | BEL_FF];
             CellInfo *ff2 = lts->cells[(half << 6) | (i << 4) | BEL_FF2];
@@ -516,7 +518,7 @@ struct FasmBackend
                 zinit = (int_or_default(ff->params, ctx->id("INIT"), 0) != 1);
                 IdString srsig;
                 std::string type = str_or_default(ff->attrs, ctx->id("X_ORIG_TYPE"), "");
-                if (type == "FDRE") {
+                if (type == "FDRE" || type == "FDRE_1") {
                     zrst = true;
                     SET_CHECK(is_latch, false);
                     SET_CHECK(is_sync, true);
@@ -540,6 +542,7 @@ struct FasmBackend
                 write_bit("ZRST", zrst);
 
                 pop();
+                log_info("IS_C_INVERTED %u\n", int_or_default(ff->params, ctx->id("IS_C_INVERTED")));
                 SET_CHECK(is_clkinv, int_or_default(ff->params, ctx->id("IS_C_INVERTED")) == 1);
 
                 NetInfo *sr = get_net_or_empty(ff, ctx->id("SR")), *ce = get_net_or_empty(ff, ctx->id("CE"));
